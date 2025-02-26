@@ -30,6 +30,8 @@ class SampleTest extends TestCase {
         $email = 'test@example.com';
         registerEmail($email); // Ensure the email is registered first
         unsubscribeEmail($email);
+        sleep(1); // Ensure file system updates
+        
         $emails = file($this->testEmailFile, FILE_IGNORE_NEW_LINES);
         $this->assertNotContains($email, $emails);
     }
