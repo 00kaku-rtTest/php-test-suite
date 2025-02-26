@@ -31,7 +31,10 @@ class SampleTest extends TestCase {
         registerEmail($email); // Ensure the email is registered first
         unsubscribeEmail($email);
         sleep(1); // Ensure file system updates
-        
+
+        echo "DEBUG: Checking File Path - $this->testEmailFile" . PHP_EOL;
+        echo "DEBUG: File Exists? " . (file_exists($this->testEmailFile) ? 'Yes' : 'No') . PHP_EOL;
+        echo "DEBUG: File Contents - " . file_get_contents($this->testEmailFile) . PHP_EOL;
         $emails = file($this->testEmailFile, FILE_IGNORE_NEW_LINES);
         $this->assertNotContains($email, $emails);
     }
