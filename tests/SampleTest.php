@@ -16,7 +16,6 @@ class SampleTest extends TestCase {
     public function testRegisterEmail() {
         $email = 'test@example.com';
         registerEmail($email);
-        file_put_contents( $this->testEmailFile, $email . "\n", FILE_APPEND );
         sleep(1); // Ensure file system updates
 
         // Debugging output
