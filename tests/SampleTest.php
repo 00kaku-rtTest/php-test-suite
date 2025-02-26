@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../functions.php';
+require_once  '/../functions.php';
 
 class EmailVerificationTest extends TestCase {
     private string $testEmailFile = __DIR__ . '/../registered_emails.txt';
