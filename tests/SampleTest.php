@@ -1,9 +1,25 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-require_once 'functions.php';
+require_once __DIR__ . '/../functions.php';
 
 class EmailVerificationTest extends TestCase {
+    private string $testEmailFile = __DIR__ . '/../registered_emails.txt';
+
+    protected function setUp(): void
+    {
+        // Ensure the file exists before testing
+        if (!file_exists($this->testEmailFile)) {
+            file_put_contents($this->testEmailFile, '');
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up test email file
+        file_put_contents($this->testEmailFile, '');
+    }
+
     public function testGenerateVerificationCode() {
         $code = generateVerificationCode();
         $this->assertIsNumeric($code);
@@ -14,13 +30,14 @@ class EmailVerificationTest extends TestCase {
     public function testRegisterEmail() {
         $email = 'test@example.com';
         registerEmail($email);
-        $this->assertStringContainsString($email, file_get_contents('registered_emails.txt'));
+        $this->assertStringContainsString($email, file_get_contents($this->testEmailFile));
     }
     
     public function testUnsubscribeEmail() {
         $email = 'test@example.com';
+        registerEmail($email); // Ensure the email is registered first
         unsubscribeEmail($email);
-        $emails = file('registered_emails.txt', FILE_IGNORE_NEW_LINES);
+        $emails = file($this->testEmailFile, FILE_IGNORE_NEW_LINES);
         $this->assertNotContains($email, $emails);
     }
     
