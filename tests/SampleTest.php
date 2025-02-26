@@ -30,7 +30,14 @@ class SampleTest extends TestCase {
     public function testRegisterEmail() {
         $email = 'test@example.com';
         registerEmail($email);
+
+        sleep(1); // Ensure file system updates
+
+        // Debugging output
+        echo "DEBUG: Checking File Path - $this->testEmailFile" . PHP_EOL;
+        echo "DEBUG: File Exists? " . (file_exists($this->testEmailFile) ? 'Yes' : 'No') . PHP_EOL;
         echo "DEBUG: File Contents - " . file_get_contents($this->testEmailFile) . PHP_EOL;
+        
         $this->assertStringContainsString($email, file_get_contents($this->testEmailFile));
     }
     
