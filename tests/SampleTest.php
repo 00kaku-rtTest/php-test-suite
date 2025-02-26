@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../src/functions.php';
 
-class EmailVerificationTest extends TestCase {
+class SampleTest extends TestCase {
     private string $testEmailFile = __DIR__ . '/../registered_emails.txt';
 
     protected function setUp(): void
