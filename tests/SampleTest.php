@@ -6,20 +6,6 @@ require_once __DIR__ . '/../../src/functions.php';
 class SampleTest extends TestCase {
     private string $testEmailFile = __DIR__ . '/../../src/registered_emails.txt';
 
-    protected function setUp(): void
-    {
-        // Ensure the file exists before testing
-        if (!file_exists($this->testEmailFile)) {
-            file_put_contents($this->testEmailFile, '');
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        // Clean up test email file
-        file_put_contents($this->testEmailFile, '');
-    }
-
     public function testGenerateVerificationCode() {
         $code = generateVerificationCode();
         $this->assertIsNumeric($code);
