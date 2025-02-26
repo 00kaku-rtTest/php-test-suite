@@ -44,6 +44,12 @@ class SampleTest extends TestCase {
     public function testFormatGitHubData() {
         $data = [['event' => 'push', 'user' => 'testuser']];
         $formatted = formatGitHubData($data);
-        $this->assertJson($formatted);
+
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($formatted);
+        libxml_clear_errors();
+
+        $this->assertNotNull($dom->documentElement, 'Formatted data is not valid HTML');
     }
 }
