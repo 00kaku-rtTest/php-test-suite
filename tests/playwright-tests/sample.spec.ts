@@ -18,6 +18,7 @@ async function getMailpitEmailCode(email) {
     throw new Error('No emails found for the provided address');
   }
 
+  console.log(data);
   const verificationEmail = data?.messages[0]; // Assuming the latest email
   const verificationCodeMatch = verificationEmail?.Snippet?.match(/\d{6}/); // Assuming the code is a 6-digit number
   if (verificationCodeMatch) {
@@ -28,7 +29,7 @@ async function getMailpitEmailCode(email) {
 
 // Utility function to check if email exists in registered_emails.txt
 function isEmailRegistered(email) {
-  const filePath = path.join(__dirname, '../../../src/registered_emailss.txt');
+  const filePath = path.join(__dirname, '../../../src/registered_emails.txt');
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   return fileContent.includes(email);
 }
