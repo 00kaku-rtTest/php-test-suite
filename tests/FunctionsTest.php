@@ -3,18 +3,17 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../src/functions.php';
 
-class SampleTest extends TestCase {
+class FunctionsTest extends TestCase {
     private string $testEmailFile = __DIR__ . '/../../src/registered_emails.txt';
 
     public function testGenerateVerificationCode() {
         $code = generateVerificationCode();
-        $this->assertIsNumeric($code);
-        $this->assertGreaterThanOrEqual(100000, $code);
-        $this->assertLessThanOrEqual(999999, $code);
+         $this->assertMatchesRegularExpression('/^\d{6}$/', $code);
     }
     
     public function testRegisterEmail() {
         $email = 'test@example.com';
+        $this->assertFileExists($this->testEmailFile);
         registerEmail($email);
         sleep(1); // Ensure file system updates
         
@@ -23,6 +22,7 @@ class SampleTest extends TestCase {
     
     public function testUnsubscribeEmail() {
         $email = 'test@example.com';
+        $this->assertFileExists($this->testEmailFile);
         registerEmail($email); // Ensure the email is registered first
         unsubscribeEmail($email);
         sleep(1); // Ensure file system updates
