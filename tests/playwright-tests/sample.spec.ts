@@ -42,7 +42,7 @@ test('should register email and verify code', async ({ page }) => {
 
   // Step 1: Submit the email in the form
   // Clear Mailpit before test
-  // await fetch('http://127.0.0.1:8025/api/v1/messages', { method: 'DELETE' });
+  await fetch('http://127.0.0.1:8025/api/v1/messages', { method: 'DELETE' });
 
   try {
     // Continue with original steps
@@ -58,6 +58,8 @@ test('should register email and verify code', async ({ page }) => {
     await page.fill('input[name="verification_code"]', verificationCode);
     await page.click('#submit-verification');
 
+    await page.waitForTimeout(3000);
+    
     // Step 4: Verify if the email is in registered_emails.txt
     const isRegistered = isEmailRegistered(email);
     expect(isRegistered).toBe(true); // Ensure email is registered
