@@ -42,7 +42,7 @@ test('should register email and verify code', async ({ page }) => {
 
   // Step 1: Submit the email in the form
   // Clear Mailpit before test
-  await fetch('http://127.0.0.1:8025/api/v1/messages', { method: 'DELETE' });
+  // await fetch('http://127.0.0.1:8025/api/v1/messages', { method: 'DELETE' });
 
   try {
     // Continue with original steps
