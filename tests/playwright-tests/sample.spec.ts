@@ -5,34 +5,65 @@ const fs = require('fs');
 const path = require('path');
 
 // Utility function to fetch emails from Mailpit
-async function getMailpitEmailCode(email) {
-  const apiUrl = 'http://127.0.0.1:8025/api/v1/messages'; // Mailpit API URL
-  const response = await fetch(apiUrl, {
-    method: 'GET',
-    headers: { 'Accept': 'application/json' },
-    params: { to: email }
-  });
+async function getMailpitEmailCode(email, maxRetries = 5, delayMs = 2000) {
+	const apiUrl = 'http://localhost:8025/api/v1/messages'; // Mailpit API URL
 
-  const data = await response.json();
-  if (data.length === 0) {
-    throw new Error('No emails found for the provided address');
-  }
+	for (let attempt = 1; attempt <= maxRetries; attempt++) {
+	  console.log(`Attempt ${attempt} to fetch email...`);
+	  const response = await fetch(apiUrl, {
+		method: 'GET',
+		headers: { 'Accept': 'application/json' }
+	  });
 
-  console.log(data);
-  const verificationEmail = data?.messages[0]; // Assuming the latest email
-  const verificationCodeMatch = verificationEmail?.Snippet?.match(/\d{6}/); // Assuming the code is a 6-digit number
-  if (verificationCodeMatch) {
-    return verificationCodeMatch[0];
-  }
-  throw new Error('No verification code found in the email');
+	  const data = await response.json();
+
+	  if (data.messages && data.messages.length > 0) {
+		const latestEmail = data.messages.find(msg => msg.To[0].Address === email);
+		if (latestEmail) {
+		  console.log(`Email found on attempt ${attempt}:`, latestEmail);
+
+		  const verificationCodeMatch = latestEmail.Snippet.match(/\d{6}/); // Match 6-digit code
+		  if (verificationCodeMatch) {
+			return verificationCodeMatch[0]; // Return extracted code
+		  }
+		}
+	  }
+
+	  if (attempt < maxRetries) {
+		console.log(`Retrying in ${delayMs / 1000} seconds...`);
+		await new Promise(resolve => setTimeout(resolve, delayMs)); // Wait before retrying
+	  } else {
+		throw new Error('No verification code found in email after multiple attempts');
+	  }
+	}
 }
 
-// Utility function to check if email exists in registered_emails.txt
-function isEmailRegistered(email) {
-  const filePath = path.join(__dirname, '../../../src/registered_emails.txt');
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  return fileContent.includes(email);
+
+// Utility function to check if email exists in registered_emails.txt with retries
+function isEmailRegistered(email, maxRetries = 5, delayMs = 2000) {
+	const filePath = path.join(__dirname, '../../../src/registered_emails.txt');
+
+	for (let attempt = 1; attempt <= maxRetries; attempt++) {
+	  console.log(`Attempt ${attempt} to check if email is registered...`);
+
+	  if (fs.existsSync(filePath)) {
+		const fileContent = fs.readFileSync(filePath, 'utf-8');
+		if (fileContent.includes(email)) {
+		  console.log(`Email found on attempt ${attempt}`);
+		  return true;
+		}
+	  }
+
+	  if (attempt < maxRetries) {
+		console.log(`Retrying in ${delayMs / 1000} seconds...`);
+		Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delayMs); // Wait before retrying
+	  } else {
+		console.warn(`Email not found after ${maxRetries} attempts.`);
+		return false;
+	  }
+	}
 }
+
 
 let passedTests = 0;
 let failedTests = 0;
@@ -42,7 +73,7 @@ test('should register email and verify code', async ({ page }) => {
 
   // Step 1: Submit the email in the form
   // Clear Mailpit before test
-  // await fetch('http://127.0.0.1:8025/api/v1/messages', { method: 'DELETE' });
+//   await fetch('http://localhost:8025/api/v1/messages', { method: 'DELETE' });
 
   try {
     // Continue with original steps
@@ -59,7 +90,7 @@ test('should register email and verify code', async ({ page }) => {
     await page.click('#submit-verification');
 
     await page.waitForTimeout(3000);
-    
+
     // Step 4: Verify if the email is in registered_emails.txt
     const isRegistered = isEmailRegistered(email);
     expect(isRegistered).toBe(true); // Ensure email is registered
