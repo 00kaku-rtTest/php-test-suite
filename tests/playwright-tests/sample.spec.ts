@@ -6,7 +6,7 @@ const path = require('path');
 const BASE_URL = 'http://127.0.0.1:8000';
 const MAILPIT_API_URL = 'http://localhost:8025/api/v1/messages';
 const CRON_JOB_URL = `${BASE_URL}/cron.php`;
-const REGISTERED_EMAILS_PATH = path.join(__dirname, '../../src/registered_emails.txt');
+const REGISTERED_EMAILS_PATH = path.join(__dirname, '../../../src/registered_emails.txt');
 
 let passedTests = 0;
 let failedTests = 0;
